@@ -323,10 +323,13 @@
 }
 
 + (ServerProfile*)importFromVmessOfV2RayN:(NSString*)vmessStr {
+    if ([vmessStr length] < 9 || [[[vmessStr substringToIndex:1] lowercaseString] isEqualToString:@"#"]) {
+        return nil;
+    }
     if ([vmessStr length] < 9 || ![[[vmessStr substringToIndex:8] lowercaseString] isEqualToString:@"vmess://"]) {
         return nil;
     }
-    NSString* decodedJsonString = [[ConfigImporter decodeBase64String:[vmessStr substringFromIndex:8]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    NSString* decodedJsonString = [[[[ConfigImporter decodeBase64String:[vmessStr substringFromIndex:8]] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]stringByReplacingOccurrencesOfString:@"\r" withString:@""]stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     NSData* decodedData = [decodedJsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSError* jsonParseError;
     NSDictionary *sharedServer = [NSJSONSerialization JSONObjectWithData:
